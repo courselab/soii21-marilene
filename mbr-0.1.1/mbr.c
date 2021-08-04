@@ -101,18 +101,28 @@ void __attribute__((fastcall, naked)) read (char *buffer)
 
      "   cmp $0xd, %%al               ;" /* Reiterate if not ascii 13 (CR)   */
     
-     "   mov   $0x0e, %%ah            ;" /* Echo character on the terminal.  */
+     "   mov $0x0e, %%ah              ;" /* Echo character on the terminal.  */
      "   int $0x10                    ;"
-     "   jne space                    ;"
+     "   jne backspace                ;"
      "   jmp cont                     ;"
     
+     "backspace:                      ;" /* I need help here    */
+     "   cmp $0x08, %%al              ;"
+     "   jne space                    ;"
+     "   mov $0x0, %%al               ;"
+     "   mov $0x0e, %%ah              ;"
+     "   dec %%si                     ;"
+     "   dec %%cx                     ;"
+     "   int $0x10                    ;"
+     "   jmp loop%=                   ;"
+
      "space:                          ;"
      "   cmp $0x20, %%al              ;"
      "   jne lp                       ;"
      "   jmp cont                     ;"
 
      "lp:                             ;"
-     "   cmp $0x5, %%cx               ;" /* Check buffer size                */ 
+     "   cmp $0x4, %%cx               ;" /* Check buffer size                */ 
      "   je cont                        ;"
      "   jmp loop%=                   ;"
 
@@ -120,7 +130,7 @@ void __attribute__((fastcall, naked)) read (char *buffer)
      "cont:                           ;"
      " mov $0x0e, %%ah                ;" /* Echo a newline.                  */
      " mov $0x0a, %%al                ;"
-     "   int $0x10                    ;"
+     " int $0x10                      ;"
      
      "   movb $0x0, -1(%%bx, %%si)    ;" /* Add buffer a string delimiter.   */
      "   ret                           " /* Return from function             */

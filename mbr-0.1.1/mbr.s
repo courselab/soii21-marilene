@@ -49,7 +49,7 @@ read:
 	movl	%edx, %ebx
 #APP
 # 90 "mbr.c" 1
-	   mov $0x0, %si               ;   mov $0x0, %cx               ;loop27:                         ;   movw $0X0, %ax              ;   int $0x16                    ;   movb %al, %es:(%bx, %si) ;   inc %si                     ;   inc %cx                     ;   cmp $0xd, %al               ;   mov   $0x0e, %ah            ;   int $0x10                    ;   jne space                    ;   jmp cont                     ;space:                          ;   cmp $0x20, %al              ;   jne lp                       ;   jmp cont                     ;lp:                             ;   cmp $0x5, %cx               ;   je cont                        ;   jmp loop27                   ;cont:                           ; mov $0x0e, %ah                ; mov $0x0a, %al                ;   int $0x10                    ;   movb $0x0, -1(%bx, %si)    ;   ret                           
+	   mov $0x0, %si               ;   mov $0x0, %cx               ;loop27:                         ;   movw $0X0, %ax              ;   int $0x16                    ;   movb %al, %es:(%bx, %si) ;   inc %si                     ;   inc %cx                     ;   cmp $0xd, %al               ;   mov $0x0e, %ah              ;   int $0x10                    ;   jne backspace                ;   jmp cont                     ;backspace:                      ;   cmp $0x08, %al              ;   jne space                    ;   mov $0x0, %al               ;   mov $0x0e, %ah              ;   dec %si                     ;   dec %cx                     ;   int $0x10                    ;   jmp loop27                   ;space:                          ;   cmp $0x20, %al              ;   jne lp                       ;   jmp cont                     ;lp:                             ;   cmp $0x4, %cx               ;   je cont                        ;   jmp loop27                   ;cont:                           ; mov $0x0e, %ah                ; mov $0x0a, %al                ; int $0x10                      ;   movb $0x0, -1(%bx, %si)    ;   ret                           
 # 0 "" 2
 #NO_APP
 	nop
@@ -71,7 +71,7 @@ help:
 	movl	$nl, %ecx
 	call	print
 #APP
-# 143 "mbr.c" 1
+# 153 "mbr.c" 1
 	ret
 # 0 "" 2
 #NO_APP
@@ -90,7 +90,7 @@ quit:
 	movl	$nl, %ecx
 	call	print
 #APP
-# 152 "mbr.c" 1
+# 162 "mbr.c" 1
 	ret
 # 0 "" 2
 #NO_APP
@@ -108,7 +108,7 @@ compare:
 	movl	%edx, %edi
 	movl	%ebx, %esi
 #APP
-# 160 "mbr.c" 1
+# 170 "mbr.c" 1
 	    mov $4, %cx   ;    mov $0x1, %ax     ;    cld                ;    repe  cmpsb        ;    jecxz  equal       ;    mov $0x0, %ax     ;equal:                 ;    ret                ;
 # 0 "" 2
 #NO_APP
