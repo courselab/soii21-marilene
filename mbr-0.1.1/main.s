@@ -2,9 +2,8 @@
 	.code16gcc
 	.text
 	.section	.rodata
-	.align 4
 .LC0:
-	.string	"welcome MARI BOOTLOADER. Type 'help'"
+	.string	"welcome MARI BOOTLOADER"
 .LC1:
 	.string	">"
 .LC2:

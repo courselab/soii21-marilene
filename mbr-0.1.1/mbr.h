@@ -73,7 +73,7 @@ void __attribute__((naked)) quit (void);
 
 #define PROMPT ">"
 
-#define INTRO "welcome MARI BOOTLOADER. Type 'help'"
+#define INTRO "welcome MARI BOOTLOADER"
 
 #define NOT_FOUND "command not found"
 
