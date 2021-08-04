@@ -1,5 +1,0 @@
-
-  printnl ("Choose a Pokemon to start:");
-  printnl ("> Bulbasaur");
-  printnl ("> Charmander");
-  printnl ("> Squirtle");
