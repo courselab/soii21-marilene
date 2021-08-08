@@ -29,33 +29,39 @@
 
 int main()
 {
+  int count = 0;
   char cmd[BUFFER_MAX_LENGTH];
 
   /* Clear screen. */
   
   clear();
-  printnl (INTRO);
 
   /* Main loop. */
   
   while (1)
     {
-  
-      print (PROMPT);		        /* Show prompt. */
-
       read (cmd);		            /* Read user command. */
 
       /* Process user command. */
       
       if (compare(cmd, HELP_CMD))       /* Command help. */
-	help();
+	      printnl ("try more");
       else if (compare(cmd, QUIT_CMD))  /* Command quit. */
-	quit();
+	      printnl ("impossible");
+
+      /* Try show hours 
+      else if (compare(cmd, DATE_CMD))
+        date();
+      */
+
       else
-	{
-	  //print (cmd);		        /* Unkown command. */
-	  printnl (NOT_FOUND);
-	}
+	      printnl (NOT_FOUND);
+    
+      count += 1;
+      if(count == 12){
+        clear();
+        count = 0;
+      }
     }
   
   return 0;

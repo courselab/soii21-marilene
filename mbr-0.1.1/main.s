@@ -3,15 +3,15 @@
 	.text
 	.section	.rodata
 .LC0:
-	.string	"welcome MARI BOOTLOADER"
-.LC1:
-	.string	">"
-.LC2:
 	.string	"help"
-.LC3:
+.LC1:
+	.string	"try more"
+.LC2:
 	.string	"quit"
+.LC3:
+	.string	"impossible"
 .LC4:
-	.string	"command not found"
+	.string	"not found"
 	.text
 	.globl	main
 	.type	main, @function
@@ -25,40 +25,47 @@ main:
 	.cfi_def_cfa_register 5
 	andl	$-16, %esp
 	subl	$16, %esp
+	movl	$0, 12(%esp)
 	call	clear
-	movl	$.LC0, %ecx
-	call	print
-	movl	$nl, %ecx
-	call	print
-.L5:
-	movl	$.LC1, %ecx
-	call	print
-	leal	11(%esp), %eax
+.L6:
+	leal	7(%esp), %eax
 	movl	%eax, %ecx
 	call	read
-	leal	11(%esp), %eax
-	movl	$.LC2, %edx
+	leal	7(%esp), %eax
+	movl	$.LC0, %edx
 	movl	%eax, %ecx
 	call	compare
 	testl	%eax, %eax
 	je	.L2
-	call	help
-	jmp	.L5
+	movl	$.LC1, %ecx
+	call	print
+	movl	$nl, %ecx
+	call	print
+	jmp	.L3
 .L2:
-	leal	11(%esp), %eax
-	movl	$.LC3, %edx
+	leal	7(%esp), %eax
+	movl	$.LC2, %edx
 	movl	%eax, %ecx
 	call	compare
 	testl	%eax, %eax
 	je	.L4
-	call	quit
-	jmp	.L5
+	movl	$.LC3, %ecx
+	call	print
+	movl	$nl, %ecx
+	call	print
+	jmp	.L3
 .L4:
 	movl	$.LC4, %ecx
 	call	print
 	movl	$nl, %ecx
 	call	print
-	jmp	.L5
+.L3:
+	addl	$1, 12(%esp)
+	cmpl	$12, 12(%esp)
+	jne	.L6
+	call	clear
+	movl	$0, 12(%esp)
+	jmp	.L6
 	.cfi_endproc
 .LFE0:
 	.size	main, .-main

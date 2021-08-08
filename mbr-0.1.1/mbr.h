@@ -63,18 +63,16 @@ int __attribute__((fastcall, naked)) compare (char *s1, char *s2);
 
 #define HELP_CMD "help"
 
-void __attribute__((naked)) help (void);
-
 /* Quit. */
 
 #define QUIT_CMD "quit"
 
-void __attribute__((naked)) quit (void);
+/* Show the time */
 
-#define PROMPT ">"
+#define DATE_CMD "date"
 
-#define INTRO "welcome MARI BOOTLOADER"
+void __attribute__((naked)) date (void);
 
-#define NOT_FOUND "command not found"
+#define NOT_FOUND "not found"
 
 #endif	/* MBR_H */

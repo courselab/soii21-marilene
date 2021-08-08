@@ -68,6 +68,17 @@ void __attribute__((naked, fastcall)) clear (void)
      " mov $0x0, %%cx                    ;" /* Upper-left corner.             */
      " mov $0x184f, %%dx                 ;" /* Upper-right corner.            */
      " int $0x10                         ;" /* Call video BIOS service.       */
+
+     " mov $0x01, %%ah                   ;" 
+     " mov $0x07, %%cx                   ;" 
+     " int $0x10                         ;" 
+
+     " mov $0x00, %%bh                   ;" 
+     " mov $0x00, %%dh                   ;"
+     " mov $0x00, %%dl                   ;" 
+     " mov $0x02, %%ah                   ;"
+     " int $0x10                         ;"
+
      " ret                                " /* Return from function. */
      ::: "ax", "bx", "cx", "dx"		    /* Additional clobbered registers.*/
      );
@@ -91,13 +102,13 @@ void __attribute__((fastcall, naked)) read (char *buffer)
     (     
      
      "   mov $0x0, %%si               ;" /* Iteration index for (%bx, %si).  */
-     "   mov $0x0, %%cx               ;" /* Buffer size is BUFFER_MAX_LENGTH.*/
+     "   mov $0x0, %%cl               ;" /* Buffer size is BUFFER_MAX_LENGTH.*/
      "loop%=:                         ;"
      "   movw $0X0, %%ax              ;" /* Choose blocking read operation.  */
      "   int $0x16                    ;" /* Call BIOS keyboard read service. */
      "   movb %%al, %%es:(%%bx, %%si) ;" /* Fill in buffer pointed by %bx.   */
      "   inc %%si                     ;"
-     "   inc %%cx                     ;"
+     "   inc %%cl                     ;"
 
      "   cmp $0xd, %%al               ;" /* Reiterate if not ascii 13 (CR)   */
     
@@ -106,14 +117,23 @@ void __attribute__((fastcall, naked)) read (char *buffer)
      "   jne backspace                ;"
      "   jmp cont                     ;"
     
-     "backspace:                      ;" /* I need help here    */
+     "backspace:                      ;"
      "   cmp $0x08, %%al              ;"
      "   jne space                    ;"
      "   mov $0x0, %%al               ;"
      "   mov $0x0e, %%ah              ;"
-     "   dec %%si                     ;"
-     "   dec %%cx                     ;"
      "   int $0x10                    ;"
+     "   mov %%bh, %%al               ;"
+     "   mov $0x0, %%bh               ;"
+     "   mov $0x03, %%ah              ;"
+     "   int $0x10                    ;"
+     "   dec %%dl                     ;"
+     "   mov $0x02, %%ah              ;"
+     "   int $0x10                    ;"
+     "   mov %%dl, %%cl               ;"
+     "   mov $0x0, %%ch               ;"
+     "   mov %%cx, %%si               ;"
+     "   mov %%al, %%bh               ;"
      "   jmp loop%=                   ;"
 
      "space:                          ;"
@@ -122,46 +142,43 @@ void __attribute__((fastcall, naked)) read (char *buffer)
      "   jmp cont                     ;"
 
      "lp:                             ;"
-     "   cmp $0x4, %%cx               ;" /* Check buffer size                */ 
-     "   je cont                        ;"
+     "   cmp $0x4, %%cl               ;" /* Check buffer size                */ 
+     "   je cont                      ;"
      "   jmp loop%=                   ;"
 
-
      "cont:                           ;"
-     " mov $0x0e, %%ah                ;" /* Echo a newline.                  */
-     " mov $0x0a, %%al                ;"
-     " int $0x10                      ;"
-     
+     "   mov $0x0e, %%ah              ;" /* Echo a newline.                  */
+     "   mov $0x0a, %%al              ;"
+     "   int $0x10                    ;"
+
      "   movb $0x0, -1(%%bx, %%si)    ;" /* Add buffer a string delimiter.   */
      "   ret                           " /* Return from function             */
      
      :
      : "b" (buffer) 	          /* Ask gcc to store buffer in %bx          */
-     : "ax",  "cx", "si" 	  /* Aditional clobbered registers.          */
+     : "ax", "cx", "si", "dx" 	  /* Aditional clobbered registers.          */
+     );
+}
+
+
+/* Try show hours 
+void __attribute__((naked)) date (void)
+{
+  __asm__ volatile
+    (     
+     " mov $0x0, %%ah                 ;"
+     " int $0x1a                      ;" 
+     " mov %%dx, %%ax                 ;"
+     " mov $0x0, %%dx                 ;"
+     " mov $0x1007, %%cx              ;"
+     " div %%cx                       ;"
+     " mov $0x0e, %%ah                ;"
+     " int $0x10                      ;"
+     " ret                             "
+     ::: "ax", "bx", "cx" 
      );
 
-  
-}
-
-/* Output a help(-less) message. */
-
-void __attribute__((naked)) help (void)
-{
-  printnl ("Still working..");
-
-
-  __asm__ ("ret");   	   /* Naked functions lack return. */
-
-}
-
-void __attribute__((naked)) quit (void)
-{
-  printnl ("Still working..");
-
-
-  __asm__ ("ret");   	   /* Naked functions lack return. */
-
-}
+} */
 
 /* Compare two strings up to position BUFFER_MAX_LENGTH-1. */
 
