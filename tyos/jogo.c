@@ -1,9 +1,34 @@
+/* <file> - <One-line note about this file>
+ 
+   Copyright (c) 2021, Garcia M. A. 
+
+   This piece of software is a derivative work of SYSeg, by Monaco F. J.
+   SYSeg is distributed under the license GNU GPL v3, and is available
+   at the official repository https://www.gitlab.com/monaco/syseg.
+
+   This file is part of <PROJECT>.
+
+   <PROJECT> is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <tyos.h>
 
 void __attribute__((fastcall, naked)) jogo()
 {
 __asm__ volatile
 ( 
+  " start:                               "
   "        mov   $0x00, %%ah           ;" 
   "        mov   $0x13, %%al           ;" 
   "        int $0x10                   ;"
@@ -26,7 +51,7 @@ __asm__ volatile
   "        mov    $0x4d, %%al           ;"
   "        movb %%al, %%es:(%%bx, %%si) ;" 
   "        inc    %%si                  ;"
-  "        cmp   $0x8340, %%si          ;"
+  "        cmp   $0x6180, %%si          ;"
   "        jne fundo_azul2              ;"
 
   " fundo_azul3:                         "
@@ -150,8 +175,8 @@ __asm__ volatile
   "        add    $320,  %%cx           ;"
   "        cmp    $0x19, %%dx           ;"
   "        jne personagem               ;"
-
   "        mov    $0x00, %%dx           ;"
+  
   " inicio:                              "
   "        mov    $0xb67f, %%si         ;"
   "        mov    $0xb67f, %%cx         ;"
@@ -163,7 +188,9 @@ __asm__ volatile
   "        add    $320,  %%si           ;"
   "        cmp    $0x19, %%dl           ;"
   "        jne obst_nascendo            ;"
-  "        jmp sleep                    ;"
+  "        cmp    $0x00, %%dh           ;"
+  "        jne salto                    ;"
+  "        jmp tecla_nao_apertada       ;"
 
   " obst_morrendo:                       "
   "        add    $25,  %%si            ;"
@@ -173,14 +200,22 @@ __asm__ volatile
   "        inc    %%dl                  ;"
   "        add    $320,  %%si           ;"
   "        cmp    $0x19, %%dl           ;"
-  "        jne obst_morrendo             ;"
-  "        jmp sleep                    ;"
+  "        jne obst_morrendo            ;"
+  "        cmp    $0x00, %%dh           ;"
+  "        jne salto                    ;"
+  "        jmp tecla_nao_apertada       ;"
 
 
   " obst_andando:                       "
+  "        movb  %%es:(%%bx, %%si),%%al ;"
+  "        cmp    $0x26, %%al           ;"
+  "        je game_over                 ;"
   "        mov    $0x01, %%al           ;"
   "        movb %%al, %%es:(%%bx, %%si) ;"
   "        add    $25,  %%si            ;"
+  "        movb  %%es:(%%bx, %%si),%%al ;"
+  "        cmp    $0x26, %%al           ;"
+  "        je game_over                 ;"
   "        mov    $0x4c, %%al           ;"
   "        movb %%al, %%es:(%%bx, %%si) ;"
   "        sub    $25,  %%si            ;"
@@ -188,12 +223,15 @@ __asm__ volatile
   "        add    $320,  %%si           ;"
   "        cmp    $0x19, %%dl           ;"
   "        jne obst_andando             ;"
-  "        jmp sleep                    ;"
+  "        cmp    $0x00, %%dh           ;"
+  "        jne salto                    ;"
+  "        jmp tecla_nao_apertada       ;"
 
   " tecla_apertada:                      "
+  "        inc    %%dh                  ;"
   "        mov    $0x00, %%ah           ;"
   "        int    $0x16                 ;"
-  "        mov    $0x0, %%ah            ;"
+  "        mov    $0x00, %%ah           ;"
   "        mov    $0xd35e, %%di         ;"
   " salto_a:                             " 
   "        mov    $0x4c, %%al           ;"
@@ -212,7 +250,7 @@ __asm__ volatile
   "        inc    %%di                  ;"
   "        cmp    $25, %%ah             ;"
   "        jne  salto_b                 ;"
-  "        jmp salto                    ;"
+  "        jmp sleep                    ;"
   " subindo:                             "
   "        sub    $370, %%di            ;"
   "        mov    $0x00, %%ah           ;"
@@ -228,14 +266,14 @@ __asm__ volatile
   "        mov    $0x0, %%ah            ;"
   " queda_b:                             " 
   "        mov    $0x4c, %%al           ;"
-  "        sub    $8025,  %%di         ;"
+  "        sub    $8025,  %%di          ;"
   "        movb %%al, %%es:(%%bx, %%di) ;"
   "        add    $8025,  %%di          ;"
   "        inc    %%ah                  ;"
   "        inc    %%di                  ;"
   "        cmp    $25, %%ah             ;"
   "        jne  queda_b                 ;"
-  "        jmp salto                    ;"
+  "        jmp sleep                    ;"
   " descendo:                            "
   "        add    $270, %%di            ;"
   "        mov    $0x00, %%ah           ;"
@@ -244,21 +282,25 @@ __asm__ volatile
   "        sub    $50, %%di             ;"
   "        jmp queda_a                  ;"
 
-  " sleep:                               "
-  "        mov    $0x00, %%dh           ;"
+  " tecla_nao_apertada:                   "
   "        mov    $0x01, %%ah           ;"
   "        int    $0x16                 ;"
   "        lahf                         ;"
   "        cmp    $0x28, %%ah           ;"
   "        jbe   tecla_apertada         ;"
-  " tecla_nao_apertada:                  "
+
+  " sleep:                               "
   "        mov    %%cx, %%bx            ;"
   "        mov    $0x0, %%cx            ;"
+  "        mov    %%dh, %%al            ;"
   "        mov    $0xff0, %%dx          ;"
   "        mov    $0x86, %%ah           ;"
   "        int    $0x15                 ;"
   "        mov    %%bx, %%cx            ;"
   "        mov    $0x0, %%bx            ;"
+  "        mov    %%al, %%dh            ;"
+  
+  " mov_bloco:                           "
   "        dec    %%cx                  ;"
   "        mov    %%cx, %%si            ;"
   "        mov    $0x00, %%dl           ;"
@@ -272,42 +314,127 @@ __asm__ volatile
 
   " salto:                               "
   "        inc    %%dh                  ;"
-  "        cmp    $77, %%dh             ;"
-  "        jg  sleep                    ;"
-
+  "        cmp    $126, %%dh            ;"
+  "        jg   final_apertada          ;"
   "        mov    %%cx, %%bx            ;"
   "        mov    $0x0, %%cx            ;"
   "        mov    %%dh, %%al            ;"
   "        mov    $0xff0, %%dx          ;"
   "        mov    $0x86, %%ah           ;"
   "        int    $0x15                 ;"
-
   "        mov    %%bx, %%cx            ;"
   "        mov    $0x0, %%bx            ;"
   "        mov    %%al, %%dh            ;"
-  "        cmp    $39, %%dh             ;"
+  "        cmp    $64, %%dh             ;"
   "        jb   subindo                 ;"
-
   "        mov    $0x00, %%ah           ;"
-  "        cmp    $39, %%dh             ;"
+  "        cmp    $64, %%dh             ;"
   "        je  descer                   ;"
-
-  "        cmp    $39, %%dh             ;"
+  "        cmp    $64, %%dh             ;"
   "        jg  descendo                 ;"
 
-  " salto_cont:                          "
-  "        dec    %%cx                  ;"
-  "        mov    %%cx, %%si            ;"
-  "        mov    $0x00, %%dl           ;"
-  "        cmp    $0xb527, %%cx         ;"
-  "        je  inicio                   ;"
-  "        cmp    $0xb540, %%cx         ;"
-  "        jbe obst_morrendo            ;"  
-  "        cmp    $0xb666, %%cx         ;"
-  "        jbe obst_andando             ;" 
-  "        jmp obst_nascendo            ;"
+  " final_apertada:                      "
+  "        mov    $0xb55e, %%si         ;"
+  "        mov    $0x00, %%ah           ;"
+  "        mov    %%cx, %%dx            ;"
+  "        mov    $0xb577, %%cx         ;" 
+  " personagem_bug:                     ;"
+  "        mov    $0x26, %%al           ;"
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        inc    %%si                  ;"
+  "        cmp   %%cx, %%si             ;"
+  "        jne personagem_bug           ;"
+  "        inc    %%ah                  ;"
+  "        add    $295,  %%si           ;"
+  "        add    $320,  %%cx           ;"
+  "        cmp    $0x19, %%ah           ;"
+  "        jne personagem_bug           ;"
+  "        mov    %%dx, %%cx            ;"
+  "        mov    $0x00, %%dh           ;"
+  "        jmp tecla_nao_apertada       ;"
 
+  " again:                              "
+  "        mov    $0x00, %%ah           ;"
+  "        int    $0x16                 ;"
+  "        cmp    $0x0d, %%al           ;"
+  "        je   start                   ;"
+  "        jmp   loop_fim               ;"
 
+  " game_over:                           "
+  "        mov    $0x00, %%si           ;"
+  " end:                                 "
+  "        mov    $0x05, %%al           ;"
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        inc    %%si                  ;"
+  "        cmp    $0xfa00, %%si         ;"
+  "        jb   end                     ;"
+
+  " f:                                   "
+  "        mov    $4, %%si              ;"
+  "        mov    $0x0f, %%al           ;"
+  "        mov    $8, %%cx              ;"
+  " f_a:                                 "
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        inc    %%si                  ;"
+  "        cmp    %%cx ,  %%si          ;"
+  "        jb   f_a                     ;"
+  "        mov    $4, %%si              ;"
+  "        mov    $1604,%%cx            ;"
+  " f_b:                                 "
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        add    $320, %%si            ;"
+  "        cmp    %%cx ,  %%si          ;"
+  "        jb   f_b                     ;"
+  "        mov    $644, %%si            ;"
+  "        mov    $646,%%cx             ;"
+  " f_c:                                 "
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        inc    %%si                  ;"
+  "        cmp    %%cx ,  %%si          ;"
+  "        jb   f_c                     ;"
+
+  " i:                                   "
+  "        mov    $12, %%si             ;"
+  "        mov    $1612, %%cx           ;"
+  " i_a:                                 "
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        add    $320, %%si            ;"
+  "        cmp    %%cx ,  %%si          ;"
+  "        jb   i_a                     ;"
+
+  " m:                                   "
+  "        mov    $16, %%si             ;"
+  "        mov    $1616, %%cx           ;"
+  " m_a:                                 "
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        add    $320, %%si            ;"
+  "        cmp    %%cx ,  %%si          ;"
+  "        jb   m_a                     ;"
+  "        mov    $337, %%si            ;"
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        mov    $658, %%si            ;"
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        mov    $979, %%si            ;"
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        mov    $660, %%si            ;"
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        mov    $341, %%si            ;"
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        mov    $22, %%si             ;"
+  "        mov    $1622,%%cx            ;"
+  " m_b:                                 "
+  "        movb %%al, %%es:(%%bx, %%si) ;"
+  "        add    $320, %%si            ;"
+  "        cmp    %%cx ,  %%si          ;"
+  "        jb   m_b                     ;"
+
+  " loop_fim:                            "
+  "        mov    $0x01, %%ah           ;"
+  "        int    $0x16                 ;"
+  "        lahf                         ;"
+  "        cmp    $0x28, %%ah           ;"
+  "        jbe   again                  ;"
+  "        jmp   loop_fim               ;"
 
   "        ret                          ;" 
   :
@@ -316,5 +443,3 @@ __asm__ volatile
 
  );
 }
-
-/* "        cmp    $0xb577, %%cx         ;"  */

@@ -6,7 +6,13 @@
 init:
 .LFB0:
 	.cfi_startproc
+#APP
+# 30 "stage2.c" 1
+	checagem:                                     mov    $0x00, %ah           ;        int    $0x16                 ;        cmp    $0x0d, %al           ;        jne   checagem               ;
+# 0 "" 2
+#NO_APP
 	call	jogo
+	call	halt
 	nop
 	ud2
 	.cfi_endproc

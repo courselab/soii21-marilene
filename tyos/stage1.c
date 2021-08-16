@@ -22,13 +22,20 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include <tyos.h>
 
-void __attribute__((fastcall, naked)) init()
+void(* init)(void) = ((void *) STAGE2_ADDR);
+
+int main()
 {
+  clear();
+  printnl ("TyOS - A really tiny OS.");
+  printnl ("Para iniciar ou reiniciar o jogo, pressione Enter");
+  printnl ("Qualquer tecla faz o personagem saltar");
+
+  load_stage2_block();
+
+  init(); 			/* This is a call to stage2 adddress */
   
-  jogo();
-  
-  //halt();			/* Halt the system. */
+  return 0;
 }

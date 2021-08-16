@@ -11,6 +11,12 @@ init:
 	.section	.rodata
 .LC0:
 	.string	"TyOS - A really tiny OS."
+	.align 4
+.LC1:
+	.string	"Para iniciar ou reiniciar o jogo, pressione Enter"
+	.align 4
+.LC2:
+	.string	"Qualquer tecla faz o personagem saltar"
 	.text
 	.globl	main
 	.type	main, @function
@@ -25,6 +31,14 @@ main:
 	andl	$-16, %esp
 	call	clear
 	movl	$.LC0, %ecx
+	call	print
+	movl	$nl, %ecx
+	call	print
+	movl	$.LC1, %ecx
+	call	print
+	movl	$nl, %ecx
+	call	print
+	movl	$.LC2, %ecx
 	call	print
 	movl	$nl, %ecx
 	call	print

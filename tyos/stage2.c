@@ -1,6 +1,6 @@
 /* <file> - <One-line note about this file>
  
-   Copyright (c) <YEAR>, <AUTHOR> 
+   Copyright (c) 2021, Garcia M. A. 
 
    This piece of software is a derivative work of SYSeg, by Monaco F. J.
    SYSeg is distributed under the license GNU GPL v3, and is available
@@ -23,20 +23,20 @@
 */
 
 
-
-
 #include <tyos.h>
 
-void(* init)(void) = ((void *) STAGE2_ADDR);
-
-int main()
+void __attribute__((fastcall, naked)) init()
 {
-  clear();
-  printnl ("TyOS - A really tiny OS.");
-
-  load_stage2_block();
-
-  init(); 			/* This is a call to stage2 adddress */
+  __asm__ volatile
+  (
+    "checagem:                             "
+    "        mov    $0x00, %%ah           ;"
+    "        int    $0x16                 ;"
+    "        cmp    $0x0d, %%al           ;"
+    "        jne   checagem               ;"
+    :::"ax"
+    );
+  jogo();
   
-  return 0;
+  halt();			/* Halt the system. */
 }

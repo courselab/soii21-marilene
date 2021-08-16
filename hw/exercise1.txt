@@ -1,0 +1,18 @@
+Exercise 1: Hello World bare metal
+
+Aluna: Marilene Andrade Garcia 
+nUSP: 10276974
+
+Perguntas:
+Have you managed to build and test the software?
+Have you managed to reproduce the examples?
+Has there been any issue during build, boot?
+If so, have you managed to solve it? How?
+
+Respostas e Conclusoes:
+
+ - Eu comecei assistindo a aula gravada pois não consegui comparecer a aula presencial. 
+ 
+ - Sobre a construcao do software e teste do codigo do hello world. Eu consegui reproduzir o exemplo da aula, e tambem clonei o repositorio do gitlab e segui as instrucoes dos README e dos slides. Precisei instalar o nasm e o qemu. Os codigos funcionaram bem no emulador, entretanto nao consegui fazer o boot pelo pen-drive no meu computador.
+ 
+ - De qualquer maneira, usando o emulador os codigos funcionaram perfeitamente. 
